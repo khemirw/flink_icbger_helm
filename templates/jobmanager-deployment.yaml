@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobmanager
+  labels:
+    app: flink
+spec:
+  replicas: {{ .Values.jobmanager.replicas }}
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}      
+      containers:
+      - name: jobmanager
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: "AWS_ACCESS_KEY_ID"
+          value: {{ .Values.environement.AWS_ACCESS_KEY_ID}}
+        - name: "AWS_SECRET_ACCESS_KEY"
+          value: {{ .Values.environement.AWS_SECRET_ACCESS_KEY}}
+        - name: "AWS_REGION"
+          value: {{ .Values.environement.AWS_REGION}}
+        - name: JOB_MANAGER_RPC_ADDRESS
+          value: "jobmanager"            
+        ports:
+        - containerPort: 8081
+          name: rest
+          protocol: TCP
+        - containerPort: 6123
+          name: jobmanager-rpc
+          protocol: TCP
+        - containerPort: 6124
+          name: blobserver
+          protocol: TCP      
+        resources:
+          {{- toYaml .Values.jobmanager.resources | nindent 10 }}
+      volumes:
+      - name: flink-config-volume
+        configMap:
+          name: flink-config
+      volumeMounts:
+      - mountPath: /opt/flink/conf
+        name: flink-config-volume

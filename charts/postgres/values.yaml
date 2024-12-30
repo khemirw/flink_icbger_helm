@@ -1,0 +1,22 @@
+# Default values for postgres.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+postgres:
+  image:
+    repository: postgres
+    tag: latest
+  environment:
+    POSTGRES_USER: dba
+    POSTGRES_PASSWORD: rules
+  service:
+    port: 5432
+  # Optional: Use persistent storage
+  persistence:
+    enabled: true
+    storageClass: "default"  # Adjust to your storage class
+    accessMode: ReadWriteOnce
+    size: 8Gi  # Adjust as needed

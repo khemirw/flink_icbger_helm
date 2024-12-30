@@ -1,0 +1,21 @@
+minio:
+  image: "minio/minio"
+  imageTag: "latest"
+  rootUser: "admin"
+  rootPassword: "password"
+  ports:
+    console: 9001
+    api: 9000
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+    size: 10Gi
+
+mc:
+  image: "minio/mc"
+  imageTag: "latest"
+  entrypoint: "/bin/sh -c 'until (/usr/bin/mc config host add minio http://minio:9000 {{ .Values.minio.rootUser }} {{ .Values.minio.rootPassword }}) do echo \"...waiting...\" && sleep 1; done; /usr/bin/mc rm -r --force minio/warehouse; /usr/bin/mc mb minio/warehouse; tail -f /dev/null'"
+  dependsOn: minio
+  restartPolicy: Always
+

@@ -1,0 +1,17 @@
+minio:
+  image: "bitnami/minio"
+  imageTag: "latest"  # Change if you want a specific version of MinIO
+  replicaCount: 1
+  rootUser: "admin"
+  rootPassword: "password"
+  ports:
+    console: 9001
+    api: 9000
+  persistence:
+    enabled: true
+    storageClass: "default"  # Modify this to match your environment
+    accessMode: ReadWriteOnce
+    size: 10Gi  # Adjust size based on your needs
+  service:
+    ingress: true
+    nodetype: LoadBalancer
